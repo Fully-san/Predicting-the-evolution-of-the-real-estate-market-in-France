@@ -1,15 +1,17 @@
-import streamlit as st
 import altair as alt
+import datetime as dt
+import matplotlib.pyplot as plt
 import numpy as np
+import os.path
 import pandas as pd
 import re
-import matplotlib.pyplot as plt
 import seaborn as sns
-import datetime as dt
+import streamlit as st
+import time
 from scipy.stats import linregress
 from scipy.stats import pearsonr
 
-@st.cache
+@st.cache(show_spinner=False)
 def load_csv(filename, usecols=None, dtype=None, sep=','):
     return pd.read_csv(filename, usecols=usecols, dtype=dtype, sep=sep)
 
@@ -138,6 +140,9 @@ cities = st.sidebar.text_area("Enter the different cities by going to the line:"
 codes = [i for i in range(1, 96) if i not in [55, 67, 68] ]
 listCodeDepartment = st.sidebar.multiselect('Select the code of the department where your cities are located', codes)
 
+st.sidebar.text('Loading of datasets (quite slow):')
+progressBar = st.sidebar.progress(0)
+
 submit = st.sidebar.button('Submit')
 
 drawTop15(pd.read_csv('data/top15.csv'))
@@ -145,8 +150,17 @@ drawTop15(pd.read_csv('data/top15.csv'))
 columnList = ['Code departement', 'Commune', 'Date mutation', 'Nature mutation', 'Nombre de lots', 'Nombre pieces principales', 'Surface Carrez du 1er lot', 'Surface Carrez du 2eme lot', 'Type local', 'Valeur fonciere']
 dataframeList = []
 fileList = ['data/valeursfoncieres-2016.txt', 'data/valeursfoncieres-2017.txt', 'data/valeursfoncieres-2018.txt', 'data/valeursfoncieres-2019.txt']
-for filename in fileList:
-    dataframeList.append(load_csv(filename, columnList, sep='|'))
+urlList = ["https://www.data.gouv.fr/fr/datasets/r/0ab442c5-57d1-4139-92c2-19672336401c", "https://www.data.gouv.fr/fr/datasets/r/7161c9f2-3d91-4caf-afa2-cfe535807f04", "https://www.data.gouv.fr/fr/datasets/r/1be77ca5-dc1b-4e50-af2b-0240147e0346", "https://www.data.gouv.fr/fr/datasets/r/3004168d-bec4-44d9-a781-ef16f41856a2", "https://www.data.gouv.fr/fr/datasets/r/90a98de0-f562-4328-aa16-fe0dd1dca60f"] 
+
+for i in range(len(fileList)):
+    if os.path.isfile(fileList[i]):
+        dataframeList.append(load_csv(fileList[i], columnList, sep='|'))
+    else:
+        dataframeList.append(load_csv(urlList[i], columnList, sep='|'))
+
+    progressBar.progress(i / len(fileList))
+
+progressBar.progress(100)
 
 if submit:
     listTypeLocal = []
