@@ -173,17 +173,20 @@ if submit:
     if 'Commercial premises' in typeLocal:
         listTypeLocal.append('Local industriel. commercial ou assimilé')
 
+    parisList = ['PARIS 01','PARIS 02','PARIS 03','PARIS 04','PARIS 05','PARIS 06','PARIS 07','PARIS 08','PARIS 09','PARIS 10','PARIS 11','PARIS 12','PARIS 13','PARIS 14','PARIS 15','PARIS 16','PARIS 17','PARIS 18','PARIS 19','PARIS 20']
+    lyonList = ['LYON 1ER', 'LYON 2EME', 'LYON 3EME', 'LYON 4EME', 'LYON 5EME', 'LYON 6EME', 'LYON 7EME', 'LYON 8EME', 'LYON 9EME']
+    marseilleList = ['MARSEILLE 1ER', 'MARSEILLE 2EME', 'MARSEILLE 3EME', 'MARSEILLE 4EME', 'MARSEILLE 5EME', 'MARSEILLE 6EME', 'MARSEILLE 7EME', 'MARSEILLE 8EME', 'MARSEILLE 9EME', 'MARSEILLE 10EME', 'MARSEILLE 11EME', 'MARSEILLE 12EME', 'MARSEILLE 13EME', 'MARSEILLE 14EME', 'MARSEILLE 15EME', 'MARSEILLE 16EME']
+
     listCity = [x.upper() for x in cities.split('\n')]
     if 'PARIS' in listCity:
-        parisList = ['PARIS 01','PARIS 02','PARIS 03','PARIS 04','PARIS 05','PARIS 06','PARIS 07','PARIS 08','PARIS 09','PARIS 10','PARIS 11','PARIS 12','PARIS 13','PARIS 14','PARIS 15','PARIS 16','PARIS 17','PARIS 18','PARIS 19','PARIS 20']
         listCity.extend(parisList)
         listCity.remove('PARIS')
-    elif 'LYON' in listCity:
-        lyonList = ['LYON 1ER', 'LYON 2EME', 'LYON 3EME', 'LYON 4EME', 'LYON 5EME', 'LYON 6EME', 'LYON 7EME', 'LYON 8EME', 'LYON 9EME']
+
+    if 'LYON' in listCity:
         listCity.extend(lyonList)
         listCity.remove('LYON')
-    elif 'MARSEILLE' in listCity:
-        marseilleList = ['MARSEILLE 1ER', 'MARSEILLE 2EME', 'MARSEILLE 3EME', 'MARSEILLE 4EME', 'MARSEILLE 5EME', 'MARSEILLE 6EME', 'MARSEILLE 7EME', 'MARSEILLE 8EME', 'MARSEILLE 9EME', 'MARSEILLE 10EME', 'MARSEILLE 11EME', 'MARSEILLE 12EME', 'MARSEILLE 13EME', 'MARSEILLE 14EME', 'MARSEILLE 15EME', 'MARSEILLE 16EME']
+
+    if 'MARSEILLE' in listCity:
         listCity.extend(marseilleList)
         listCity.remove('MARSEILLE')
 
@@ -204,6 +207,24 @@ if submit:
         source = source.set_index('date')
         source.drop(columns=['ordinalDate'], inplace=True)
         source = source.reset_index().melt('date', var_name='category', value_name='pricePerM²')
+
+        if 'PARIS 01' in listCity:
+            for elem in parisList:
+                listCity.remove(elem)
+            
+            listCity.append('PARIS')
+
+        if 'LYON 1ER' in listCity:
+            for elem in lyonList:
+                listCity.remove(elem)
+            
+            listCity.append('LYON')
+
+        if 'MARSEILLE 1ER' in listCity:
+            for elem in marseilleList:
+                listCity.remove(elem)
+            
+            listCity.append('MARSEILLE')
 
         title = "Evolution of the average monthly price per m² for the cities of"
         for city in listCity:
